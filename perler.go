@@ -21,20 +21,6 @@ const (
 	bufSize = 2 << 17 // 256K
 )
 
-const perlerForm = `
-<html><body>
-  <form id="form" method="POST" action="/" enctype="multipart/form-data">
-    <label for="file">Select a PNG file</label>
-    <input type="file" name="file" id="file" accept="image/png"></input>
-  </form>
-  <script type="text/javascript">
-    document.getElementById("file").onchange = function() {
-      document.getElementById("form").submit();
-    };
-  </script>
-</body></html>
-`
-
 var perlerTmpl = template.Must(template.New("tmpl").Parse(`
 <html><body>
   <a href="/">&laquo; Back</a><br />
@@ -53,12 +39,12 @@ var perlerTmpl = template.Must(template.New("tmpl").Parse(`
 `))
 
 func init() {
-	http.HandleFunc("/", perlerHandler)
+	http.HandleFunc("/upload", perlerHandler)
 }
 
 func perlerHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		w.Write([]byte(perlerForm))
+	if r.Method != "POST" {
+		http.Error(w, r.Method+" not supported", http.StatusMethodNotAllowed)
 		return
 	}
 
