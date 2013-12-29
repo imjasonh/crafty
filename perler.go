@@ -7,7 +7,6 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -50,13 +49,17 @@ func perlerHandler(w http.ResponseWriter, r *http.Request) {
 
 	mpf, _, err := r.FormFile("file")
 	if err != nil {
-		log.Fatal(err)
+		c.Errorf("formfile: %v", err)
+		http.Error(w, "No file specified", http.StatusBadRequest)
+		return
 	}
 	defer mpf.Close()
 
 	img, err := png.Decode(mpf)
 	if err != nil {
-		log.Fatal(err)
+		c.Errorf("png decode: %v", err)
+		http.Error(w, "Error decoding PNG", http.StatusBadRequest)
+		return
 	}
 
 	// Make a palette out of all the possible bead colors
