@@ -1,4 +1,4 @@
-package perlerize
+package paletteize
 
 import (
 	"bytes"
@@ -11,16 +11,16 @@ import (
 	"sort"
 	"strconv"
 	"text/template"
+
+	"appengine"
 )
 
 const (
-	rgb8to16          = 0x101       // Multiply an 8-bit RGB value to 16-bit
-	perlerWidthInches = 0.181102362 // Inches width of a Perler bead
-
-	bufSize = 2 << 17 // 256K
+	rgb8to16 = 0x101   // Multiply an 8-bit RGB value to 16-bit
+	bufSize  = 2 << 17 // 256K
 )
 
-var perlerTmpl = template.Must(template.New("tmpl").Parse(`
+var tmpl = template.Must(template.New("tmpl").Parse(`
 <html><body>
   <a href="/">&laquo; Back</a><br />
 
@@ -28,7 +28,7 @@ var perlerTmpl = template.Must(template.New("tmpl").Parse(`
 
   <p>Physical dimensions: {{.PhysDim}}</p>
 
-  <p>{{.Total}} total beads</p>
+  <p>{{.Total}} pixels</p>
   <table>
     {{range .Counts}}
     <tr><td>{{.Key}}</td><td>{{.Val}}</td>
@@ -38,10 +38,11 @@ var perlerTmpl = template.Must(template.New("tmpl").Parse(`
 `))
 
 func init() {
-	http.HandleFunc("/upload", perlerHandler)
+	http.HandleFunc("/upload", handler)
 }
 
-func perlerHandler(w http.ResponseWriter, r *http.Request) {
+func handler(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
 	if r.Method != "POST" {
 		http.Error(w, r.Method+" not supported", http.StatusMethodNotAllowed)
 		return
@@ -62,9 +63,18 @@ func perlerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Make a palette out of all the possible bead colors
+	// Select palette map to use
+	pal, ok := palettes[r.FormValue("palette")]
+	if !ok {
+
+		c.Errorf("unknown palette %q", r.FormValue("palette"))
+		http.Error(w, "Unknown palette", http.StatusBadRequest)
+		return
+	}
+
+	// Make a palette out of all the possible colors
 	var palette color.Palette
-	for k, _ := range paletteMap {
+	for k, _ := range pal.colors {
 		palette = append(palette, k)
 	}
 	paletted := palettedImage{img, palette}
@@ -78,12 +88,12 @@ func perlerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Physical dimensions
 	str := func(x int) string {
-		return strconv.FormatFloat(float64(x)*perlerWidthInches, 'g', 3, 64)
+		return strconv.FormatFloat(float64(x)*pal.size, 'g', 3, 64)
 	}
 	physX := str(img.Bounds().Max.X)
 	physY := str(img.Bounds().Max.Y)
 
-	// Total and per-bead counts
+	// Total and per-color counts
 	var total uint32
 	colors := make(map[string]uint32)
 	for i := paletted.Bounds().Min.X; i < paletted.Bounds().Max.X; i++ {
@@ -93,11 +103,11 @@ func perlerHandler(w http.ResponseWriter, r *http.Request) {
 			if a == 0 {
 				continue
 			}
-			colors[paletteMap[c]]++
+			colors[pal.colors[c]]++
 			total++
 		}
 	}
-	perlerTmpl.Execute(w, struct {
+	tmpl.Execute(w, struct {
 		DataURI string
 		Total   uint32
 		PhysDim string
@@ -177,110 +187,6 @@ func (m myColor) RGBA() (r, g, b, a uint32) {
 }
 func col(r, g, b uint32) color.Color {
 	return myColor{r, g, b}
-}
-
-// Map of available Perler bead colors to their name
-// From https://sites.google.com/site/degenatrons/other-stuff/bead-pattern-generator
-var paletteMap = map[color.Color]string{
-	// Perler bead colors
-	col(255, 255, 255): "P01-WHITE",
-	col(240, 230, 195): "P02-CREAM",
-	col(255, 235, 55):  "P03-YELLOW",
-	col(255, 115, 80):  "P04-ORANGE",
-	col(205, 70, 90):   "P05-RED",
-	col(240, 130, 175): "P06-BUBBLE-GUM",
-	col(120, 95, 155):  "P07-PURPLE",
-	col(35, 80, 145):   "P08-DARK-BLUE",
-	col(45, 130, 200):  "P09-LIGHT-BLUE",
-	col(40, 140, 100):  "P10-DARK-GREEN",
-	col(75, 195, 180):  "P11-LIGHT-GREEN",
-	col(110, 90, 85):   "P12-BROWN",
-	col(150, 155, 160): "P17-GREY",
-	col(0, 0, 0):       "P18-BLACK",
-	col(165, 90, 90):   "P20-RUST",
-	col(160, 130, 95):  "P21-LIGHT-BROWN",
-	col(250, 205, 195): "P33-PEACH",
-	col(205, 165, 135): "P35-TAN",
-	col(255, 60, 130):  "P38-MAGENTA",
-	col(90, 160, 205):  "P52-PASTEL-BLUE",
-	col(135, 210, 145): "P53-PASTEL-GREEN",
-	col(155, 135, 205): "P54-PASTEL-LAVENDER",
-	col(215, 155, 200): "P55-PASTEL-PINK",
-	col(245, 240, 155): "P56-PASTEL-YELLOW",
-	col(250, 200, 85):  "P57-CHEDDAR",
-	col(160, 215, 225): "P58-TOOTHPASTE",
-	col(255, 90, 115):  "P59-HOT-CORAL",
-	col(175, 90, 160):  "P60-PLUM",
-	col(125, 210, 80):  "P61-KIWI-LIME",
-	col(5, 150, 205):   "P62-TURQUOISE",
-	col(255, 150, 160): "P63-BLUSH",
-	col(85, 125, 185):  "P70-PERIWINKLE",
-	col(245, 200, 230): "P79-LIGHT-PINK",
-	col(115, 185, 115): "P80-BRIGHT-GREEN",
-	col(240, 95, 165):  "P83-PINK",
-	col(190, 70, 115):  "P88-RASPBERRY",
-	col(240, 150, 110): "P90-BUTTERSCOTCH",
-	col(0, 150, 165):   "P91-PARROT-GREEN",
-	col(95, 100, 100):  "P92-DARK-GREY",
-
-	// Hama bead colors
-	col(250, 240, 195): "H02-CREAM",
-	col(255, 215, 90):  "H03-YELLOW",
-	col(240, 105, 95):  "H04-ORANGE",
-	col(245, 155, 175): "H06-PINK",
-	col(35, 85, 160):   "H08-BLUE",
-	col(120, 90, 145):  "H07-PURPLE",
-	col(25, 105, 180):  "H09-LIGHT-BLUE",
-	col(35, 125, 95):   "H10-GREEN",
-	col(70, 195, 165):  "H11-LIGHT-GREEN",
-	col(100, 75, 80):   "H12-BROWN",
-	col(145, 150, 155): "H17-GREY",
-	col(170, 85, 80):   "H20-BROWN",
-	col(190, 130, 100): "H21-LIGHT-BROWN",
-	col(175, 75, 85):   "H22-DARK-RED",
-	col(240, 170, 165): "H26-FLESH",
-	col(225, 185, 150): "H27-BEIGE",
-	col(70, 85, 90):    "H28-DARK-GREEN",
-	col(195, 80, 115):  "H29-RASPBERRY",
-	col(115, 75, 85):   "H30-BURGUNDY",
-	col(105, 160, 175): "H31-TURQUOISE",
-	col(255, 95, 200):  "H32-FUCHSIA",
-	col(245, 240, 125): "H43-PASTEL-YELLOW",
-	col(255, 120, 140): "H44-PASTEL-CORAL",
-	col(165, 140, 205): "H45-PASTEL-PURPLE",
-	col(80, 170, 225):  "H46-PASTEL-BLUE",
-	col(150, 230, 160): "H47-PASTEL-GREEN",
-	col(230, 135, 200): "H48-PASTEL-PINK",
-	col(240, 175, 95):  "H60-TEDDY-BEAR",
-
-	// Nabbi bead colors
-	col(90, 85, 80):    "N02-DARK-BROWN",
-	col(105, 75, 80):   "N03-BROWN-MEDIUM",
-	col(150, 85, 100):  "N04-WINE-RED",
-	col(190, 125, 85):  "N05-BUTTERSCOTCH",
-	col(185, 160, 145): "N06-BEIGE",
-	col(240, 195, 150): "N07-SKIN",
-	col(160, 160, 155): "N08-ASH-GREY",
-	col(70, 100, 90):   "N09-DARK-GREEN",
-	col(230, 225, 225): "N10-LIGHT-GREY",
-	col(115, 90, 155):  "N11-PURPLE",
-	col(245, 225, 215): "N12-IVORY",
-	col(255, 210, 75):  "N14-YELLOW",
-	col(50, 145, 100):  "N16-GREEN",
-	col(0, 120, 210):   "N17-BLUE",
-	col(245, 200, 190): "N18-LIGHT-PINK",
-	col(215, 65, 85):   "N19-LIGHT-RED",
-	col(210, 155, 125): "N20-LIGHT-BROWN",
-	col(255, 245, 175): "N21-LIGHT-YELLOW",
-	col(55, 170, 100):  "N22-PEARL-GREEN",
-	col(90, 170, 235):  "N23-PASTEL-BLUE",
-	col(200, 185, 240): "N24-LILAC",
-	col(255, 120, 165): "N25-OLD-ROSE",
-	col(255, 185, 150): "N26-LIGHT-ORANGE",
-	col(145, 105, 100): "N27-BROWN",
-	col(160, 205, 245): "N28-LIGHT-BLUE",
-	col(225, 160, 85):  "N29-PEARL-ORANGE",
-	col(200, 200, 120): "N30-OLIVE",
 }
 
 type pair struct {
