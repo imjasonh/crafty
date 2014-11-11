@@ -1,81 +1,96 @@
 <html>
 <head><style>
-* {
-  font-family: Arial, sans-serif;
-}
-
-#file {
-  width: 300px;
-  height: 200px;
-  border: 1px dashed black;
-}
+* { font-family: Arial, sans-serif; }
 </style></head>
 <body>
-  <table id="table" style="display: none;">
-    <tr><td>Original</td><td><canvas id="orig" width=0 height=0></canvas></td></tr>
-    <tr><td>Out</td><td><canvas id="out" width=0 height=0></canvas></td>
-      <td><button id="save">Save</button></td></tr>
-  </table>
-  <input type="file" id="file" accept="image/png"></input>
+  <h3>Select an image</h3>
+  <ul>
+    <li>From a local file: <input type="file" id="file" accept="image/png"></input></li>
+    <li>or select one of these images...</li>
+  </ul>
+  <img src="cyclops.png" id="cyclops"/>
+  <img src="colossus.png" id="colossus"/>
+  <img src="magneto.png" id="magneto"/>
+  <img src="storm.png" id="storm"/>
+  <img src="dazzler.png" id="dazzler"/>
+  <img src="kitty.png" id="kitty"/>
+
+  <h3>Select a palette</h3>
   <select id="palette">
     <option value="dmc" selected>DMC thread</option>
     <option value="simple">Simple RGB</option>
   </select>
+
+  <table id="table" style="display: none;">
+    <h3>Paletted image</h3>
+    <tr><td>Original</td><td><canvas id="orig" width=0 height=0></canvas></td></tr>
+    <tr><td>Out</td><td><canvas id="out" width=0 height=0></canvas></td>
+      <td><button id="save">Save</button></td></tr>
+  </table>
+
 </body>
 <script type="text/javascript">
-var file = null;
+var img = null;
 document.getElementById('file').onchange = function(e) {
   var files = e.target.files || e.dataTransfer.files;
-  file = files[0];
-  update();
+  update(files[0]);
 };
 
 document.getElementById('palette').onchange = function(e) {
-  if (file == null) { return; }
-  update();
+  if (img == null) { return; }
+  palettize();
 };
 
-function update() {
+['cyclops', 'colossus', 'magneto', 'storm', 'dazzler', 'kitty'].forEach(function(c) {
+  document.getElementById(c).onclick = function(e) {
+    img = e.target;
+    palettize();
+  };
+});
+
+function palettize() {
   var orig = document.getElementById('orig');
   var origCtx = orig.getContext('2d');
   var out = document.getElementById('out');
   var outCtx = out.getContext('2d');
+  orig.width = img.width;
+  orig.height = img.height;
+  origCtx.drawImage(img, 0, 0);
+  out.width = img.width;
+  out.height = img.height;
+
+  var imgd = origCtx.getImageData(0,0,orig.width,orig.height);
+  var palette = palettes[document.getElementById('palette').value];
+  var pix = imgd.data;
+  var map = {};
+  closestMap = {};
+  for (var i = 0, n = pix.length; i < n; i += 4) {
+    var r = pix[i  ] * pix[i+3]/255;
+    var g = pix[i+1] * pix[i+3]/255;
+    var b = pix[i+2] * pix[i+3]/255;
+    if (pix[i+3] == 0) {
+      // transparent
+      continue;
+    }
+    var cl = closest([r,g,b], palette);
+    if (cl in map) { map[cl]++; } else { map[cl] = 1; }
+    pix[i  ] = cl[0];
+    pix[i+1] = cl[1];
+    pix[i+2] = cl[2];
+  }
+  outCtx.putImageData(imgd,0,0);
+  document.getElementById('table').style.display = '';
+  console.log(map);
+}
+
+function update(file) {
   var reader = new FileReader();
   reader.onload = function(e){
-    var img = new Image();
+    img = new Image();
     img.src = e.target.result;
-    orig.width = img.width;
-    orig.height = img.height;
-    origCtx.drawImage(img, 0, 0);
-    out.width = img.width;
-    out.height = img.height;
-
-    var imgd = origCtx.getImageData(0,0,img.width,img.height);
-    var palette = palettes[document.getElementById('palette').value];
-    var pix = imgd.data;
-    var map = {};
-    closestMap = {};
-    for (var i = 0, n = pix.length; i < n; i += 4) {
-      var r = pix[i  ] * pix[i+3]/255;
-      var g = pix[i+1] * pix[i+3]/255;
-      var b = pix[i+2] * pix[i+3]/255;
-      if (pix[i+3] == 0) {
-        // transparent
-        continue;
-      }
-
-      var cl = closest([r,g,b], palette);
-      if (cl in map) { map[cl]++; } else { map[cl] = 1; }
-
-      pix[i  ] = cl[0];
-      pix[i+1] = cl[1];
-      pix[i+2] = cl[2];
-    }
-    outCtx.putImageData(imgd,0,0);
-    console.log(map);
+    palettize();
   };
   reader.readAsDataURL(file);
-  document.getElementById('table').style.display = '';
 };
 
 document.getElementById('save').onclick = function(e) {
