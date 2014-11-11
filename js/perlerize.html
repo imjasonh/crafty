@@ -17,11 +17,25 @@
       <td><button id="save">Save</button></td></tr>
   </table>
   <input type="file" id="file" accept="image/png"></input>
+  <select id="palette">
+    <option value="dmc" selected>DMC thread</option>
+    <option value="simple">Simple RGB</option>
+  </select>
 </body>
 <script type="text/javascript">
+var file = null;
 document.getElementById('file').onchange = function(e) {
   var files = e.target.files || e.dataTransfer.files;
-  var file = files[0];
+  file = files[0];
+  update();
+};
+
+document.getElementById('palette').onchange = function(e) {
+  if (file == null) { return; }
+  update();
+};
+
+function update() {
   var orig = document.getElementById('orig');
   var origCtx = orig.getContext('2d');
   var out = document.getElementById('out');
@@ -37,6 +51,7 @@ document.getElementById('file').onchange = function(e) {
     out.height = img.height;
 
     var imgd = origCtx.getImageData(0,0,img.width,img.height);
+    var palette = palettes[document.getElementById('palette').value];
     var pix = imgd.data;
     var map = {};
     closestMap = {};
@@ -49,7 +64,7 @@ document.getElementById('file').onchange = function(e) {
         continue;
       }
 
-      var cl = closest([r,g,b]);
+      var cl = closest([r,g,b], palette);
       if (cl in map) { map[cl]++; } else { map[cl] = 1; }
 
       pix[i  ] = cl[0];
@@ -69,12 +84,12 @@ document.getElementById('save').onclick = function(e) {
 
 // color is a three-element array
 var closestMap = {};
-function closest(color) {
+function closest(color, palette) {
   if (color in closestMap) { return closestMap[color]; }
   var closest = null;
   var dist = Infinity;
-  for (var i = 0; i < dmc.length; i++) {
-    var c = dmc[i];
+  for (var i = 0; i < palette.length; i++) {
+    var c = palette[i];
     if (color == c) { return c; }
     var d = distance(c, color);
     if (closest == null || d < dist) {
@@ -98,7 +113,8 @@ function hex(color) {
       color[2].toString(16);
 }
 
-var dmc = [
+var palettes = {
+  'dmc': [
 	[255, 255, 255, "000-blancWhite"],
 	[148, 91, 128,  "208-Lavender-VYDK"],
 	[206, 148, 186, "209-Lavender-DK"],
@@ -458,6 +474,14 @@ var dmc = [
 	[139, 109, 115, "3787-BrownGrey-DK"],
 	[140, 117, 109, "3790-BeigeGrey-ULTDK"],
 	[81, 76, 83,    "3799-PewterGrey-VYDK"]
-];
+  ],
+  'simple': [
+	[0,0,0, "Black"],
+	[255,255,255, "White"],
+	[255,0,0,"Red"],
+	[0,255,0,"Blue"],
+	[0,0,255,"Green"]
+  ]
+};
 </script>
 </html>
