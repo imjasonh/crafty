@@ -81,7 +81,7 @@ function palettize() {
   orig.height = img.height;
   origCtx.drawImage(img, 0, 0);
 
-  if (orig.width * orig.height > 1000000 &&
+  if (orig.width * orig.height > 10000 &&
       !window.confirm('This is a large image, are you sure you want to proceed? It may take a while...')) {
     return;
   }
