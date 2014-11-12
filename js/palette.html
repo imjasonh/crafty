@@ -1,6 +1,8 @@
 <!-- TODO: print breakdown of colors -->
 <!-- TODO: scale up out canvas, preserving pixel borders... no CSS scaling :( -->
 <!-- TODO: support drag-and-drop -->
+<!-- TODO: support fetching file by URL (requires CORS on the server) -->
+<!-- TODO: limit number of colors so that you don't get one pixel of a color -->
 <html>
 <head><style>
 * { font-family: Arial, sans-serif; }
@@ -8,8 +10,8 @@
 <body>
   <h3>Select an image</h3>
   <ul>
-    <li>From a local file: <input type="file" id="file" accept="image/png"></input></li>
-    <li>or select one of these images...</li>
+    <li>...from a local file: <input type="file" id="file" accept="image/*"></input></li>
+    <li>...or choose from one of these images:</li>
   </ul>
   <img src="cyclops.png" id="cyclops"/>
   <img src="colossus.png" id="colossus"/>
