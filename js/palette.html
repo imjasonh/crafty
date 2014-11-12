@@ -1,4 +1,3 @@
-<!-- TODO: print breakdown of colors -->
 <!-- TODO: scale up out canvas, preserving pixel borders... no CSS scaling :( -->
 <!-- TODO: support drag-and-drop -->
 <!-- TODO: support fetching file by URL (requires CORS on the server) -->
@@ -38,6 +37,8 @@ img.clickable { cursor: pointer; }
       <tr><td>Original</td><td><img id="orig" /></td></tr>
       <tr><td>Out</td><td><img id="out" class="clickable" /></td></tr>
     </table>
+    <h3>Color breakdown</h3>
+    <table id="counts"></table>
   </div>
 
 </body>
@@ -99,7 +100,7 @@ function palettize() {
   outImg.onclick = function() { window.open(out.toDataURL()); };
 
   document.getElementById('table').style.display = '';
-  console.log(map);
+  printMap(map);
 }
 
 function update(file) {
@@ -138,9 +139,45 @@ function distance(a, b) {
 }
 
 function hex(color) {
-  return '#' + color[0].toString(16) +
-      color[1].toString(16) +
-      color[2].toString(16);
+  var r = parseInt(color[0]).toString(16); if (r.length == 1) { r = '0' + r; }
+  var g = parseInt(color[1]).toString(16); if (g.length == 1) { g = '0' + g; }
+  var b = parseInt(color[2]).toString(16); if (b.length == 1) { b = '0' + b; }
+  return '#' + r + g + b;
+}
+
+function printMap(map) {
+  // Sort map by color count
+  var arr = [];
+  for (k in map) {
+    arr.push({'count': map[k], 'color': k.split(',')});
+  }
+  arr.sort(function(a, b) {
+    if (a.count == b.count) { return 0; }
+    if (a.count < b.count) { return 1; }
+    return -1;
+  });
+
+  // Clear the table
+  var table = document.getElementById('counts');
+  while (table.firstChild) {
+    table.removeChild(table.firstChild);
+  }
+
+  for (var i = 0; i < arr.length; i++) {
+    var tr = document.createElement('tr');
+    var c1 = document.createElement('td');
+    c1.innerText = arr[i].color[3];
+    var c2 = document.createElement('td');
+    c2.innerText = arr[i].count;
+    var c3 = document.createElement('td');
+    c3.style.backgroundColor = hex(arr[i].color);
+    c3.style.width = '200px';
+
+    tr.appendChild(c1);
+    tr.appendChild(c2);
+    tr.appendChild(c3);
+    table.appendChild(tr);
+  }
 }
 
 var palettes = {
