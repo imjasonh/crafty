@@ -9,6 +9,7 @@
 <style>
 * { font-family: Arial, sans-serif; }
 img.clickable { cursor: pointer; }
+span#warning { color: red; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -31,6 +32,7 @@ img.clickable { cursor: pointer; }
     <option value="simple">Simple RGB</option>
   </select>
 
+  <span id="warning">Whoa! This is a large image, rendering may take a while!</span>
   <div id="table" style="display: none;">
     <h3>Paletted image</h3>
     <table>
@@ -61,6 +63,8 @@ document.getElementById('palette').onchange = function(e) {
   };
 });
 
+document.getElementById('warning').style.display = 'none';
+
 function palettize() {
   var orig = document.createElement('canvas');
   var origCtx = orig.getContext('2d');
@@ -69,6 +73,13 @@ function palettize() {
   orig.width = img.width;
   orig.height = img.height;
   origCtx.drawImage(img, 0, 0);
+
+  var warn = document.getElementById('warning');
+  warn.style.display = 'none';
+  if (orig.width * orig.height > 1000000) {
+    warn.style.display = '';
+  }
+
   document.getElementById('orig').src = orig.toDataURL();
   out.width = img.width;
   out.height = img.height;
