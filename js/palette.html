@@ -2,10 +2,13 @@
 <!-- TODO: scale up out canvas, preserving pixel borders... no CSS scaling :( -->
 <!-- TODO: support drag-and-drop -->
 <html>
-<head><style>
+<head>
+<title>Image paletter</title>
+<style>
 * { font-family: Arial, sans-serif; }
 img.clickable { cursor: pointer; }
-</style></head>
+</style>
+</head>
 <body>
   <h3>Select an image</h3>
   <ul>
@@ -26,11 +29,13 @@ img.clickable { cursor: pointer; }
     <option value="simple">Simple RGB</option>
   </select>
 
-  <table id="table" style="display: none;">
+  <div id="table" style="display: none;">
     <h3>Paletted image</h3>
-    <tr><td>Original</td><td><img id="orig" /></td></tr>
-    <tr><td>Out</td><td><img id="out" class="clickable" /></td></tr>
-  </table>
+    <table>
+      <tr><td>Original</td><td><img id="orig" /></td></tr>
+      <tr><td>Out</td><td><img id="out" class="clickable" /></td></tr>
+    </table>
+  </div>
 
 </body>
 <script type="text/javascript">
