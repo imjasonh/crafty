@@ -115,34 +115,29 @@ function palettize() {
   outImg.onclick = function() { window.open(out.toDataURL()); };
 
   // Create a larger canvas, draw a rect for each non-transparent pixel in the out canvas.
-  var scaled = document.createElement('canvas');
+  var scaled = document.getElementById('scaled');
   var scaledCtx = scaled.getContext('2d');
   scaled.width = out.width * RESIZE;
   scaled.height = out.height * RESIZE;
   for (var x = 0; x < orig.width; x++) {
     for (var y = 0; y < orig.height; y++) {
-      // TODO: this can probably be gotten from the pix array we already have...
-      var p = outCtx.getImageData(x, y, 1, 1).data; // Get pixel data
+      var idx = y*out.width*4 + x*4;
+      var p = imgd.data.subarray(idx, idx+4);
       if (p[3] == 0) { continue; } // transparent
       scaledCtx.fillStyle = hex(p);
       scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE, RESIZE);
 
       // Draw a horizontal line of the grid
       scaledCtx.moveTo(0, y*RESIZE);
-      scaledCtx.lineTo(orig.width*RESIZE, y*RESIZE);
+      scaledCtx.lineTo(scaled.width, y*RESIZE);
       scaledCtx.stroke();
     }
     // Draw a vertical line of the grid
     scaledCtx.moveTo(x*RESIZE, 0);
-    scaledCtx.lineTo(x*RESIZE, orig.height*RESIZE);
+    scaledCtx.lineTo(x*RESIZE, scaled.height);
     scaledCtx.stroke();
   }
-  // We render the canvas offscreen then all-at-once load it into the visible canvas
-  var canvas = document.getElementById('scaled');
-  canvas.width = scaled.width;
-  canvas.height = scaled.height;
-  canvas.getContext('2d').putImageData(scaledCtx.getImageData(0,0,scaled.width, scaled.height), 0,0);
-  canvas.onclick = function() { window.open(canvas.toDataURL()); };
+  scaled.onclick = function() { window.open(scaled.toDataURL()); };
 
   document.getElementById('table').style.display = '';
   printMap(map);
