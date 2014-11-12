@@ -1,8 +1,8 @@
 <!-- TODO: scale up out canvas, preserving pixel borders... no CSS scaling :( -->
-<!-- TODO: support drag-and-drop -->
+<!-- TODO: add mouseover to show color under the pointer, when image is scaled up -->
+<!-- TODO: support file drag-and-drop -->
 <!-- TODO: support fetching file by URL (requires CORS on the server) -->
 <!-- TODO: limit number of colors so that you don't get one pixel of a color -->
-<!-- TODO: add mouseover to show color under the pointer, when image is scaled up -->
 <html>
 <head>
 <title>Image paletter</title>
@@ -41,6 +41,8 @@ span#warning { color: red; font-weight: bold; }
     </table>
     <h3>Color breakdown</h3>
     <table id="counts"></table>
+    <h3>Physical dimensions</h3>
+    <div id="dimensions"></div>
   </div>
 
 </body>
@@ -97,7 +99,7 @@ function palettize() {
       // transparent
       continue;
     }
-    var cl = closest([r,g,b], palette);
+    var cl = closest([r,g,b], palette.colors);
     if (cl in map) { map[cl]++; } else { map[cl] = 1; }
     pix[i  ] = cl[0];
     pix[i+1] = cl[1];
@@ -112,6 +114,9 @@ function palettize() {
 
   document.getElementById('table').style.display = '';
   printMap(map);
+  document.getElementById('dimensions').innerText = (
+    Math.round(out.width*palette.dimensions*100)/100 + '" wide, ' +
+    Math.round(out.height*palette.dimensions*100)/100 + '" tall');
 }
 
 function update(file) {
@@ -192,7 +197,7 @@ function printMap(map) {
 }
 
 var palettes = {
-  'dmc': [
+  'dmc': {'dimensions': 1.0 / 14, 'colors': [ // 14-count
     [255, 255, 255, "000-blancWhite"],
     [148, 91, 128,  "208-Lavender-VYDK"],
     [206, 148, 186, "209-Lavender-DK"],
@@ -552,8 +557,8 @@ var palettes = {
     [139, 109, 115, "3787-BrownGrey-DK"],
     [140, 117, 109, "3790-BeigeGrey-ULTDK"],
     [81, 76, 83,    "3799-PewterGrey-VYDK"]
-  ],
-  'perler': [
+  ]},
+  'perler': {'dimensions': 0.181102362, colors: [
     // Perler bead colors
     [255, 255, 255, "P01-WHITE"],
     [240, 230, 195, "P02-CREAM"],
@@ -653,14 +658,14 @@ var palettes = {
     [160, 205, 245, "N28-LIGHT-BLUE"],
     [225, 160, 85,  "N29-PEARL-ORANGE"],
     [200, 200, 120, "N30-OLIVE"]
-  ],
-  'simple': [
+  ]},
+  'simple': {'dimensions': 0, 'colors': [
     [0,0,0, "Black"],
     [255,255,255, "White"],
     [255,0,0,"Red"],
     [0,255,0,"Blue"],
     [0,0,255,"Green"]
-  ]
+  ]}
 };
 </script>
 </html>
