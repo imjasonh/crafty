@@ -4,7 +4,7 @@
 <html>
 <head><style>
 * { font-family: Arial, sans-serif; }
-img { cursor: pointer; }
+img.clickable { cursor: pointer; }
 </style></head>
 <body>
   <h3>Select an image</h3>
@@ -12,12 +12,12 @@ img { cursor: pointer; }
     <li>From a local file: <input type="file" id="file" accept="image/png"></input></li>
     <li>or select one of these images...</li>
   </ul>
-  <img src="cyclops.png" id="cyclops"/>
-  <img src="colossus.png" id="colossus"/>
-  <img src="magneto.png" id="magneto"/>
-  <img src="storm.png" id="storm"/>
-  <img src="dazzler.png" id="dazzler"/>
-  <img src="kitty.png" id="kitty"/>
+  <img src="cyclops.png" id="cyclops" class="clickable"/>
+  <img src="colossus.png" id="colossus" class="clickable"/>
+  <img src="magneto.png" id="magneto" class="clickable"/>
+  <img src="storm.png" id="storm" class="clickable"/>
+  <img src="dazzler.png" id="dazzler" class="clickable"/>
+  <img src="kitty.png" id="kitty" class="clickable"/>
 
   <h3>Select a palette</h3>
   <select id="palette">
@@ -27,9 +27,8 @@ img { cursor: pointer; }
 
   <table id="table" style="display: none;">
     <h3>Paletted image</h3>
-    <tr><td>Original</td><td><canvas id="orig" width=0 height=0></canvas></td></tr>
-    <tr><td>Out</td><td><canvas id="out" width=0 height=0></canvas></td>
-      <td><button id="save">Save</button></td></tr>
+    <tr><td>Original</td><td><img id="orig" /></td></tr>
+    <tr><td>Out</td><td><img id="out" class="clickable" /></td></tr>
   </table>
 
 </body>
@@ -53,13 +52,14 @@ document.getElementById('palette').onchange = function(e) {
 });
 
 function palettize() {
-  var orig = document.getElementById('orig');
+  var orig = document.createElement('canvas');
   var origCtx = orig.getContext('2d');
-  var out = document.getElementById('out');
+  var out = document.createElement('canvas');
   var outCtx = out.getContext('2d');
   orig.width = img.width;
   orig.height = img.height;
   origCtx.drawImage(img, 0, 0);
+  document.getElementById('orig').src = orig.toDataURL();
   out.width = img.width;
   out.height = img.height;
 
@@ -84,6 +84,11 @@ function palettize() {
   }
   outCtx.putImageData(imgd, 0, 0);
   outCtx.imageSmoothingEnabled = false;
+
+  var outImg = document.getElementById('out')
+  outImg.src = out.toDataURL();
+  outImg.onclick = function() { window.open(out.toDataURL()); };
+
   document.getElementById('table').style.display = '';
   console.log(map);
 }
@@ -96,10 +101,6 @@ function update(file) {
     palettize();
   };
   reader.readAsDataURL(file);
-};
-
-document.getElementById('save').onclick = function(e) {
-  window.open(document.getElementById('out').toDataURL());
 };
 
 // color is a three-element array
