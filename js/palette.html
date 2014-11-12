@@ -9,7 +9,6 @@
 <style>
 * { font-family: Arial, sans-serif; }
 img.clickable { cursor: pointer; }
-span#warning { color: red; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -32,7 +31,6 @@ span#warning { color: red; font-weight: bold; }
     <option value="simple">Simple RGB</option>
   </select>
 
-  <span id="warning" style="display: none;">Whoa! This is a large image, rendering may take a while!</span>
   <div id="table" style="display: none;">
     <h3>Paletted image</h3>
     <table>
@@ -74,7 +72,10 @@ function palettize() {
   orig.height = img.height;
   origCtx.drawImage(img, 0, 0);
 
-  document.getElementById('warning').style.display = (orig.width * orig.height > 100000) ? '' : 'none';
+  if (orig.width * orig.height > 1000000 &&
+      !window.confirm('This is a large image, are you sure you want to proceed? It may take a while...')) {
+    return;
+  }
 
   document.getElementById('orig').src = orig.toDataURL();
   out.width = img.width;
