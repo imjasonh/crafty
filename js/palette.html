@@ -8,7 +8,6 @@
 <title>Image paletter</title>
 <style>
 * { font-family: Arial, sans-serif; }
-img.clickable { cursor: pointer; }
 canvas { cursor: pointer; }
 </style>
 </head>
@@ -18,12 +17,14 @@ canvas { cursor: pointer; }
     <li>...from a local file: <input type="file" id="file" accept="image/*"></input></li>
     <li>...or choose from one of these images:</li>
   </ul>
-  <img src="cyclops.png" id="cyclops" class="clickable"/>
-  <img src="colossus.png" id="colossus" class="clickable"/>
-  <img src="magneto.png" id="magneto" class="clickable"/>
-  <img src="storm.png" id="storm" class="clickable"/>
-  <img src="dazzler.png" id="dazzler" class="clickable"/>
-  <img src="kitty.png" id="kitty" class="clickable"/>
+  <table id="samples"><tr>
+    <td><img src="rcr.png" /></td>
+    <td><img src="mario.png" /></td>
+    <td><img src="megaman.png" /></td>
+    <td><img src="airman.png" /></td>
+    <td><img src="cyclops.png" /></td>
+    <td><img src="storm.png" /></td>
+  </tr></table>
 
   <h3>Select a palette</h3>
   <select id="palette">
@@ -36,7 +37,7 @@ canvas { cursor: pointer; }
     <h3>Paletted image</h3>
     <table>
       <tr><td>Original</td><td><img id="orig" /></td></tr>
-      <tr><td>Palleted</td><td><img id="out" class="clickable" /></td></tr>
+      <tr><td>Palleted</td><td><img id="out" /></td></tr>
       <tr><td>Pattern</td><td><canvas id="scaled"></canvas></td></tr>
     </table>
     <h3>Color breakdown</h3>
@@ -47,7 +48,7 @@ canvas { cursor: pointer; }
 
 </body>
 <script type="text/javascript">
-var RESIZE = 10; // Scale output canvas by this much
+var RESIZE = 10; // Scale pattern canvas by this much
 
 var img = null;
 document.getElementById('file').onchange = function(e) {
@@ -60,12 +61,14 @@ document.getElementById('palette').onchange = function(e) {
   palettize();
 };
 
-['cyclops', 'colossus', 'magneto', 'storm', 'dazzler', 'kitty'].forEach(function(c) {
-  document.getElementById(c).onclick = function(e) {
+var samples = document.getElementsByTagName('img');
+for (var i = 0; i < samples.length; i++) {
+  samples[i].onclick = function(e) {
     img = e.target;
     palettize();
   };
-});
+  samples[i].style.cursor = 'pointer';
+}
 
 function colorAt(arr, w, x, y) {
   var idx = 4*w*y + 4*x;
