@@ -17,12 +17,12 @@ span#selected-color { border: 1px solid black; }
     <li>...or choose from one of these images:</li>
   </ul>
   <table id="samples"><tr>
-    <td><img src="rcr.png" /></td>
-    <td><img src="mario.png" /></td>
-    <td><img src="megaman.png" /></td>
-    <td><img src="airman.png" /></td>
-    <td><img src="cyclops.png" /></td>
-    <td><img src="storm.png" /></td>
+    <td><img src="images/rcr.png" /></td>
+    <td><img src="images/mario.png" /></td>
+    <td><img src="images/megaman.png" /></td>
+    <td><img src="images/airman.png" /></td>
+    <td><img src="images/cyclops.png" /></td>
+    <td><img src="images/storm.png" /></td>
   </tr></table>
 
   <h3>Select a palette</h3>
