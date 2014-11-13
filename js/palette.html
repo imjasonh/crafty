@@ -86,11 +86,6 @@ function palettize() {
   origCtx.drawImage(img, 0, 0);
   document.getElementById('orig').src = orig.toDataURL();
 
-  if (orig.width * orig.height > 10000 &&
-      !window.confirm('This is a large image, are you sure you want to proceed? It may take a while...')) {
-    return;
-  }
-
   var out = document.createElement('canvas');
   var outCtx = out.getContext('2d');
   out.width = img.width;
@@ -121,6 +116,11 @@ function palettize() {
   var outImg = document.getElementById('out')
   outImg.src = out.toDataURL();
   outImg.onclick = function() { window.open(out.toDataURL()); };
+
+  if (orig.width * orig.height > 5000 &&
+      !window.confirm('This is a large image, are you sure you want to generate the pattern? It may take a while...')) {
+    return;
+  }
 
   // Create a larger canvas, draw a rect for each non-transparent pixel in the out canvas.
   var scaled = document.getElementById('scaled');
