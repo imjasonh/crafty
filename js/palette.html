@@ -1,5 +1,3 @@
-<!-- TODO: scale up out canvas, preserving pixel borders... no CSS scaling :( -->
-<!-- TODO: add mouseover to show color under the pointer, when image is scaled up -->
 <!-- TODO: support file drag-and-drop -->
 <!-- TODO: support fetching file by URL (requires CORS on the server) -->
 <!-- TODO: limit number of colors so that you don't get one pixel of a color -->
@@ -8,7 +6,6 @@
 <title>Image paletter</title>
 <style>
 * { font-family: Arial, sans-serif; }
-canvas { cursor: pointer; }
 </style>
 </head>
 <body>
@@ -38,6 +35,7 @@ canvas { cursor: pointer; }
     <table>
       <tr><td>Original</td><td><img id="orig" /></td></tr>
       <tr><td>Palleted</td><td><img id="out" /></td></tr>
+      <tr><td id="selected-color"></td><td id="selected"></td></tr>
       <tr><td>Pattern</td><td><canvas id="scaled"></canvas></td></tr>
     </table>
     <h3>Color breakdown</h3>
@@ -134,6 +132,8 @@ function palettize() {
       scaledCtx.moveTo(0, y*RESIZE);
       scaledCtx.lineTo(scaled.width, y*RESIZE);
       scaledCtx.stroke();
+
+      setTimeout(0); // HACK
     }
     // Draw a vertical line of the grid
     scaledCtx.moveTo(x*RESIZE, 0);
@@ -141,6 +141,24 @@ function palettize() {
     scaledCtx.stroke();
   }
   scaled.onclick = function() { window.open(scaled.toDataURL()); };
+  scaled.onmousemove = function(e) {
+    var x = Math.floor(e.offsetX / RESIZE);
+    var y = Math.floor(e.offsetY / RESIZE);
+    var p = outCtx.getImageData(x, y, 1, 1).data;
+    if (p[3] == 0) {
+// TODO: hide tooltip
+      return;
+    }
+    for (var i = 0; i < palette.colors.length; i++) {
+      var c = palette.colors[i];
+      if (hex(c) == hex(p)) { // HACK
+// TODO: make this a tooltip
+        document.getElementById('selected').innerText = c[3];
+        document.getElementById('selected-color').style.backgroundColor = hex(p);
+        break;
+      }
+    }
+  };
 
   document.getElementById('table').style.display = '';
   printMap(map);
