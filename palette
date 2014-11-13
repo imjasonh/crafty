@@ -8,6 +8,7 @@
 * { font-family: Arial, sans-serif; }
 div#selected { background-color: white; padding: 5px; border: 1px solid black; }
 span#selected-color { border: 1px solid black; }
+a { position: absolute; bottom: 10; right: 10; }
 </style>
 </head>
 <body>
@@ -49,6 +50,7 @@ span#selected-color { border: 1px solid black; }
     <div id="dimensions"></div>
   </div>
 
+  <a href="https://github.com/ImJasonH/palette" target="_blank">source on GitHub</a>
 </body>
 <script src="palette.js"></script>
 </html>
