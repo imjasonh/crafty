@@ -6,6 +6,8 @@
 <title>Image paletter</title>
 <style>
 * { font-family: Arial, sans-serif; }
+div#selected { background-color: white; padding: 5px; border: 1px solid black; }
+span#selected-color { border: 1px solid black; }
 </style>
 </head>
 <body>
@@ -35,9 +37,12 @@
     <table>
       <tr><td>Original</td><td><img id="orig" /></td></tr>
       <tr><td>Palleted</td><td><img id="out" /></td></tr>
-      <tr><td id="selected-color"></td><td id="selected"></td></tr>
       <tr><td>Pattern</td><td><canvas id="scaled"></canvas></td></tr>
     </table>
+    <div id="selected">
+      <span id="selected-text"></span>
+      <span id="selected-color" style="display: inline-block; width: 100px;">&nbsp;</span>
+    </div>
     <h3>Color breakdown</h3>
     <table id="counts"></table>
     <h3>Physical dimensions</h3>
@@ -141,24 +146,29 @@ function palettize() {
     scaledCtx.stroke();
   }
   scaled.onclick = function() { window.open(scaled.toDataURL()); };
+  var s = document.getElementById('selected');
   scaled.onmousemove = function(e) {
     var x = Math.floor(e.offsetX / RESIZE);
     var y = Math.floor(e.offsetY / RESIZE);
     var p = outCtx.getImageData(x, y, 1, 1).data;
+    var s = document.getElementById('selected')
+    s.style.display = (p[3] == 0) ? 'none': '';
     if (p[3] == 0) {
-// TODO: hide tooltip
       return;
     }
+    s.style.position = 'absolute';
+    s.style.top = e.pageY + 20;
+    s.style.left = e.pageX + 20;
     for (var i = 0; i < palette.colors.length; i++) {
       var c = palette.colors[i];
       if (hex(c) == hex(p)) { // HACK
-// TODO: make this a tooltip
-        document.getElementById('selected').innerText = c[3];
+        document.getElementById('selected-text').innerText = c[3];
         document.getElementById('selected-color').style.backgroundColor = hex(p);
         break;
       }
     }
   };
+  scaled.onmouseout = function() { s.style.display = 'none'; };
 
   document.getElementById('table').style.display = '';
   printMap(map);
@@ -235,7 +245,7 @@ function printMap(map) {
     c2.innerText = arr[i].count;
     var c3 = document.createElement('td');
     c3.style.backgroundColor = hex(arr[i].color);
-    c3.style.width = '200px';
+    c3.style.width = '100px';
 
     tr.appendChild(c1);
     tr.appendChild(c2);
