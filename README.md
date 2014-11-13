@@ -1,9 +1,6 @@
-perlerize
-=========
+Client-side tool to generate crafting patterns from small images (e.g., sprites)
 
-App Engine app to generate perler bead templates from PNG images
-
-https://perlerize.appspot.com
+http://www.imjasonh.com/palette/palette
 
 ----------
 
