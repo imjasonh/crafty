@@ -76,7 +76,8 @@ function palettize() {
   scaled.onmousemove = function(e) {
     var x = Math.floor(e.offsetX / RESIZE);
     var y = Math.floor(e.offsetY / RESIZE);
-    var p = outCtx.getImageData(x, y, 1, 1).data;
+    var idx = y*out.width*4 + x*4;
+    var p = imgd.data.subarray(idx, idx+4);
     s.style.display = (p[3] == 0) ? 'none': '';
     if (p[3] == 0) {
       return;
