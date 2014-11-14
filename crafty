@@ -58,7 +58,7 @@ img, canvas { vertical-align: middle; }
     <div id="dimensions"></div>
   </div>
 
-  <a href="https://github.com/ImJasonH/palette" target="_blank">by ImJasonH<br />source on GitHub</a>
+  <a href="https://github.com/ImJasonH/crafty" target="_blank">by ImJasonH<br />source on GitHub</a>
 </body>
 <script src="crafty.js"></script>
 </html>
