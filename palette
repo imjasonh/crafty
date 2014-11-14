@@ -11,6 +11,7 @@ div#selected { background-color: white; padding: 5px; border: 1px solid black; }
 div#selected-text { white-space: nowrap; }
 div#selected-color { border: 1px solid black; }
 a { position: fixed; bottom: 10; right: 10; }
+img, canvas { vertical-align: middle; }
 </style>
 </head>
 <body>
@@ -19,33 +20,31 @@ a { position: fixed; bottom: 10; right: 10; }
     <li>...from a local file: <input type="file" id="file" accept="image/*"></input></li>
     <li>...or choose from one of these images:</li>
   </ul>
-  <table id="samples"><tr>
-    <td><img src="images/rcr.png" /></td>
-    <td><img src="images/mario.png" /></td>
-    <td><img src="images/megaman.png" /></td>
-    <td><img src="images/airman.png" /></td>
-    <td><img src="images/cyclops.png" /></td>
-    <td><img src="images/storm.png" /></td>
-    <td><img src="images/tyson.png" /></td>
-    <td><img src="images/cap.png" /></td>
-  </tr></table>
+  <div>
+    <img src="images/rcr.png" />
+    <img src="images/mario.png" />
+    <img src="images/megaman.png" />
+    <img src="images/airman.png" />
+    <img src="images/cyclops.png" />
+    <img src="images/storm.png" />
+    <img src="images/tyson.png" />
+    <img src="images/cap.png" />
+  </div>
 
-  <h3>Select a palette</h3>
+  <h3>Options</h3>
   <select id="palette">
     <option value="dmc" selected>DMC thread</option>
     <option value="perler">Perler beads</option>
     <option value="simple">Simple RGB</option>
   </select>
-
   <input type="checkbox" id="bwpattern" /><label for="bwpattern">Black & white pattern</label>
 
   <div id="table" style="display: none;">
-    <h3>Paletted image</h3>
-    <table>
-      <tr><td>Original</td><td><img id="orig" /></td></tr>
-      <tr><td>Palleted</td><td><canvas id="out" onclick="window.open(this.toDataURL());" /></td></tr>
-      <tr><td>Pattern</td><td><canvas id="scaled" onclick="window.open(this.toDataURL());" /></td></tr>
-    </table>
+    <h3>Image</h3>
+    <img id="orig" /> &raquo; <canvas id="out" onclick="window.open(this.toDataURL());"></canvas>
+    <h3>Pattern</h3>
+    <canvas id="scaled" onclick="window.open(this.toDataURL());"></canvas>
+
     <div id="selected" style="display: none;">
       <div id="selected-text"></div>
       <div id="selected-color">&nbsp;</div>
