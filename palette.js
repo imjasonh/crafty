@@ -104,7 +104,7 @@ function palettize() {
     for (var i = 0; i < palette.colors.length; i++) {
       var c = palette.colors[i];
       if (hex(c) == hex(p)) { // HACK
-        st.innerText = c[3];
+        st.innerText = c[3] + ' @ (' + x + ','+ y + ')';
         sc.style.backgroundColor = hex(p);
         break;
       }

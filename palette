@@ -7,8 +7,9 @@
 <style>
 * { font-family: Arial, sans-serif; }
 div#selected { background-color: white; padding: 5px; border: 1px solid black; }
-span#selected-color { border: 1px solid black; }
-a { position: absolute; bottom: 10; right: 10; }
+div#selected-text { white-space: nowrap; }
+div#selected-color { border: 1px solid black; }
+a { position: fixed; bottom: 10; right: 10; }
 </style>
 </head>
 <body>
@@ -41,8 +42,8 @@ a { position: absolute; bottom: 10; right: 10; }
       <tr><td>Pattern</td><td><canvas id="scaled"></canvas></td></tr>
     </table>
     <div id="selected" style="display: none;">
-      <span id="selected-text"></span>
-      <span id="selected-color" style="display: inline-block; width: 100px;">&nbsp;</span>
+      <div id="selected-text"></div>
+      <div id="selected-color">&nbsp;</div>
     </div>
     <h3>Color breakdown</h3>
     <table id="counts"></table>
