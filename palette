@@ -21,14 +21,14 @@ img, canvas { vertical-align: middle; }
     <li>...or choose from one of these images:</li>
   </ul>
   <div>
-    <img src="images/rcr.png" />
-    <img src="images/mario.png" />
-    <img src="images/megaman.png" />
-    <img src="images/airman.png" />
-    <img src="images/cyclops.png" />
-    <img src="images/storm.png" />
-    <img src="images/tyson.png" />
-    <img src="images/cap.png" />
+    <img src="images/mario.png" title="Mario" />
+    <img src="images/rcr.png" title="River City Ransom" />
+    <img src="images/megaman.png" title="Mega Man" />
+    <img src="images/airman.png" title="Air Man" />
+    <img src="images/cyclops.png" title="Cyclops" />
+    <img src="images/storm.png" title="Storm" />
+    <img src="images/tyson.png" title="Mike Tyson" />
+    <img src="images/cap.png" title="Captain America" />
   </div>
 
   <h3>Options</h3>
@@ -41,8 +41,11 @@ img, canvas { vertical-align: middle; }
 
   <div id="table" style="display: none;">
     <h3>Image</h3>
-    <img id="orig" /> &raquo; <canvas id="out" onclick="window.open(this.toDataURL());"></canvas>
+    <img id="orig" title="Original image" />
+    &raquo;
+    <canvas id="out" onclick="window.open(this.toDataURL());" title="Paletted image (click to save)"></canvas>
     <h3>Pattern</h3>
+    <p>(click to save)</p>
     <canvas id="scaled" onclick="window.open(this.toDataURL());"></canvas>
 
     <div id="selected" style="display: none;">
