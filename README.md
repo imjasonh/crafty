@@ -1,6 +1,6 @@
 Client-side tool to generate crafting patterns from small images (e.g., sprites)
 
-http://www.imjasonh.com/palette/palette
+http://www.imjasonh.com/crafty
 
 ----------
 
