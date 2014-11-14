@@ -64,7 +64,7 @@ function palettize() {
   outImg.src = out.toDataURL();
   outImg.onclick = function() { window.open(out.toDataURL()); };
 
-  if (orig.width * orig.height > 5000 &&
+  if (orig.width * orig.height > 1000000 &&
       !window.confirm('This is a large image, are you sure you want to generate the pattern? It may take a while...')) {
     return;
   }
@@ -72,27 +72,19 @@ function palettize() {
   // Create a larger canvas, draw a rect for each non-transparent pixel in the out canvas.
   var scaled = document.getElementById('scaled');
   var scaledCtx = scaled.getContext('2d');
+  scaledCtx.lineWidth = 0.5;
   scaled.width = out.width * RESIZE;
   scaled.height = out.height * RESIZE;
   for (var x = 0; x < orig.width; x++) {
     for (var y = 0; y < orig.height; y++) {
       var idx = y*out.width*4 + x*4;
       var p = imgd.data.subarray(idx, idx+4);
-      if (p[3] == 0) { continue; } // transparent
-      scaledCtx.fillStyle = hex(p);
-      scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE, RESIZE);
-
-      // Draw a horizontal line of the grid
-      scaledCtx.moveTo(0, y*RESIZE);
-      scaledCtx.lineTo(scaled.width, y*RESIZE);
-      scaledCtx.stroke();
-
-      setTimeout(0); // HACK
+      if (p[3] != 0) { 
+        scaledCtx.fillStyle = hex(p);
+        scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
+      }
+      scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
     }
-    // Draw a vertical line of the grid
-    scaledCtx.moveTo(x*RESIZE, 0);
-    scaledCtx.lineTo(x*RESIZE, scaled.height);
-    scaledCtx.stroke();
   }
   scaled.onclick = function() { window.open(scaled.toDataURL()); };
   var s = document.getElementById('selected');
