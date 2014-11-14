@@ -68,34 +68,6 @@ function palettize() {
     drawCanvas();
   }
 
-  drawCanvas();
-
-  var s = document.getElementById('selected');
-  var st = document.getElementById('selected-text');
-  var sc = document.getElementById('selected-color');
-  scaled.onmousemove = function(e) {
-    var x = Math.floor(e.offsetX / RESIZE);
-    var y = Math.floor(e.offsetY / RESIZE);
-    var idx = y*out.width*4 + x*4;
-    var p = imgd.data.subarray(idx, idx+4);
-    s.style.display = (p[3] == 0) ? 'none': '';
-    if (p[3] == 0) {
-      return;
-    }
-    s.style.position = 'absolute';
-    s.style.top = e.pageY + 20;
-    s.style.left = e.pageX + 20;
-    for (var i = 0; i < palette.colors.length; i++) {
-      var c = palette.colors[i];
-      if (hex(c) == hex(p)) { // HACK
-        st.innerText = c[3] + ' @ (' + x + ','+ y + ')';
-        sc.style.backgroundColor = hex(p);
-        break;
-      }
-    }
-  };
-  scaled.onmouseout = function() { s.style.display = 'none'; };
-
   document.getElementById('table').style.display = '';
   printMap(map);
   document.getElementById('dimensions').innerText = (
@@ -119,6 +91,33 @@ function drawCanvas(highlight) {
       scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
     }
   }
+
+  var s = document.getElementById('selected');
+  var st = document.getElementById('selected-text');
+  var sc = document.getElementById('selected-color');
+  var palette = palettes[document.getElementById('palette').value];
+  scaled.onmousemove = function(e) {
+    var x = Math.floor(e.offsetX / RESIZE);
+    var y = Math.floor(e.offsetY / RESIZE);
+    var idx = y*out.width*4 + x*4;
+    var p = imgd.data.subarray(idx, idx+4);
+    s.style.display = (p[3] == 0) ? 'none': '';
+    if (p[3] == 0) {
+      return;
+    }
+    s.style.position = 'absolute';
+    s.style.top = e.pageY + 20;
+    s.style.left = e.pageX + 20;
+    for (var i = 0; i < palette.colors.length; i++) {
+      var c = palette.colors[i];
+      if (hex(c) == hex(p)) { // HACK
+        st.innerText = c[3] + ' @ (' + x + ','+ y + ')';
+        sc.style.backgroundColor = hex(p);
+        break;
+      }
+    }
+  };
+  scaled.onmouseout = function() { s.style.display = 'none'; };
 }
 
 function update(file) {
