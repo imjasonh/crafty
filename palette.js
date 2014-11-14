@@ -1,4 +1,4 @@
-var RESIZE = 10; // Scale pattern canvas by this much
+var RESIZE = 15; // Scale pattern canvas by this much
 
 var out = document.getElementById('out');
 var scaled = document.getElementById('scaled');
@@ -9,7 +9,12 @@ document.getElementById('file').onchange = function(e) {
   update(files[0]);
 };
 
-document.getElementById('palette').onchange = function(e) {
+document.getElementById('bwpattern').onchange = function() {
+  if (img == null) { return; }
+  palettize();
+};
+
+document.getElementById('palette').onchange = function() {
   if (img == null) { return; }
   palettize();
 };
@@ -65,28 +70,41 @@ function palettize() {
 
   if (orig.width * orig.height < 1000000 ||
       !window.confirm('This is a large image, are you sure you want to generate the pattern? It may take a while...')) {
-    drawCanvas();
+    drawCanvas(map);
   }
 
-  document.getElementById('table').style.display = '';
-  printMap(map);
   document.getElementById('dimensions').innerText = (
     Math.round(out.width*palette.dimensions*100)/100 + '" wide, ' +
     Math.round(out.height*palette.dimensions*100)/100 + '" tall');
 }
 
-function drawCanvas(highlight) {
+// TODO: unicode symbols?
+var ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-=_+,./\][{}:"<>?'.split('');
+
+function drawCanvas(map) {
   var imgd = out.getContext('2d').getImageData(0, 0, out.width, out.height);
   var scaledCtx = scaled.getContext('2d');
   scaled.width = out.width * RESIZE;
   scaled.height = out.height * RESIZE;
+  var symbols = {}, a = 0;
   for (var x = 0; x < orig.width; x++) {
     for (var y = 0; y < orig.height; y++) {
       var idx = y*out.width*4 + x*4;
       var p = imgd.data.subarray(idx, idx+4);
-      if (p[3] != 0) { 
-        scaledCtx.fillStyle = hex(p);
-        scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
+      if (p[3] != 0) {
+        var c = hex(p);
+
+	if (document.getElementById('bwpattern').checked) {
+	  if (!symbols[c]) {
+            symbols[c] = ALPHABET[a++];
+          }
+	  var s = symbols[c];
+	  scaledCtx.font = '12px Arial';
+          scaledCtx.strokeText(s, x*RESIZE+RESIZE/3, y*RESIZE+RESIZE*2/3, RESIZE);
+        } else {
+          scaledCtx.fillStyle = c;
+          scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
+	}
       }
       scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
     }
@@ -118,6 +136,8 @@ function drawCanvas(highlight) {
     }
   };
   scaled.onmouseout = function() { s.style.display = 'none'; };
+
+  printMap(map, symbols);
 }
 
 function update(file) {
@@ -162,7 +182,8 @@ function hex(color) {
   return '#' + r + g + b;
 }
 
-function printMap(map) {
+function printMap(map, symbols) {
+  document.getElementById('table').style.display = '';
   // Sort map by color count
   var arr = [];
   for (k in map) {
@@ -181,15 +202,21 @@ function printMap(map) {
   }
 
   for (var i = 0; i < arr.length; i++) {
+    var c = hex(arr[i].color);
     var tr = document.createElement('tr');
+    var c0 = document.createElement('td');
+    if (c in symbols) {
+      c0.innerText = '(' + symbols[c] + ') ';
+    }
     var c1 = document.createElement('td');
     c1.innerText = arr[i].color[3];
     var c2 = document.createElement('td');
     c2.innerText = arr[i].count;
     var c3 = document.createElement('td');
-    c3.style.backgroundColor = hex(arr[i].color);
+    c3.style.backgroundColor = c;
     c3.style.width = '100px';
 
+    tr.appendChild(c0);
     tr.appendChild(c1);
     tr.appendChild(c2);
     tr.appendChild(c3);

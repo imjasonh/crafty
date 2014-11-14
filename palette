@@ -3,6 +3,7 @@
 <!-- TODO: limit number of colors so that you don't get one pixel of a color -->
 <html>
 <head>
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
 <title>Image paletter</title>
 <style>
 * { font-family: Arial, sans-serif; }
@@ -35,6 +36,8 @@ a { position: fixed; bottom: 10; right: 10; }
     <option value="perler">Perler beads</option>
     <option value="simple">Simple RGB</option>
   </select>
+
+  <input type="checkbox" id="bwpattern" /><label for="bwpattern">Black & white pattern</label>
 
   <div id="table" style="display: none;">
     <h3>Paletted image</h3>
