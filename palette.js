@@ -28,11 +28,6 @@ for (var i = 0; i < samples.length; i++) {
   samples[i].style.cursor = 'pointer';
 }
 
-function colorAt(arr, w, x, y) {
-  var idx = 4*w*y + 4*x;
-  return arr[idx], arr[idx+1], arr[idx+2], arr[idx+3];
-}
-
 function palettize() {
   var orig = document.createElement('canvas');
   var origCtx = orig.getContext('2d');
@@ -94,17 +89,17 @@ function drawCanvas(map) {
       if (p[3] != 0) {
         var c = hex(p);
 
-	if (document.getElementById('bwpattern').checked) {
-	  if (!symbols[c]) {
+        if (document.getElementById('bwpattern').checked) {
+          if (!symbols[c]) {
             symbols[c] = ALPHABET[a++];
           }
-	  var s = symbols[c];
-	  scaledCtx.font = '12px Arial';
+          var s = symbols[c];
+          scaledCtx.font = '12px Arial';
           scaledCtx.strokeText(s, x*RESIZE+RESIZE/3, y*RESIZE+RESIZE*2/3, RESIZE);
         } else {
           scaledCtx.fillStyle = c;
           scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
-	}
+        }
       }
       scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
     }
@@ -128,9 +123,13 @@ function drawCanvas(map) {
     s.style.left = e.pageX + 20;
     for (var i = 0; i < palette.colors.length; i++) {
       var c = palette.colors[i];
-      if (hex(c) == hex(p)) { // HACK
+      var hc = hex(c);
+      if (hc == hex(p)) { // HACK
         st.innerText = c[3] + ' @ (' + x + ','+ y + ')';
-        sc.style.backgroundColor = hex(p);
+        if (hc in symbols) {
+          st.innerText = '(' + symbols[hc] + ') ' + st.innerText;
+        }
+        sc.style.backgroundColor = hc;
         break;
       }
     }
