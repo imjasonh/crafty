@@ -25,6 +25,8 @@ a { position: fixed; bottom: 10; right: 10; }
     <td><img src="images/airman.png" /></td>
     <td><img src="images/cyclops.png" /></td>
     <td><img src="images/storm.png" /></td>
+    <td><img src="images/tyson.png" /></td>
+    <td><img src="images/cap.png" /></td>
   </tr></table>
 
   <h3>Select a palette</h3>
@@ -38,8 +40,8 @@ a { position: fixed; bottom: 10; right: 10; }
     <h3>Paletted image</h3>
     <table>
       <tr><td>Original</td><td><img id="orig" /></td></tr>
-      <tr><td>Palleted</td><td><img id="out" /></td></tr>
-      <tr><td>Pattern</td><td><canvas id="scaled"></canvas></td></tr>
+      <tr><td>Palleted</td><td><canvas id="out" onclick="window.open(this.toDataURL());" /></td></tr>
+      <tr><td>Pattern</td><td><canvas id="scaled" onclick="window.open(this.toDataURL());" /></td></tr>
     </table>
     <div id="selected" style="display: none;">
       <div id="selected-text"></div>

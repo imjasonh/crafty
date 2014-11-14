@@ -1,5 +1,8 @@
 var RESIZE = 10; // Scale pattern canvas by this much
 
+var out = document.getElementById('out');
+var scaled = document.getElementById('scaled');
+
 var img = null;
 document.getElementById('file').onchange = function(e) {
   var files = e.target.files || e.dataTransfer.files;
@@ -33,7 +36,6 @@ function palettize() {
   origCtx.drawImage(img, 0, 0);
   document.getElementById('orig').src = orig.toDataURL();
 
-  var out = document.createElement('canvas');
   var outCtx = out.getContext('2d');
   out.width = img.width;
   out.height = img.height;
@@ -59,34 +61,15 @@ function palettize() {
     pix[i+2] = cl[2];
   }
   outCtx.putImageData(imgd, 0, 0);
+  out.onclick = function() { window.open(out.toDataURL()); };
 
-  var outImg = document.getElementById('out')
-  outImg.src = out.toDataURL();
-  outImg.onclick = function() { window.open(out.toDataURL()); };
-
-  if (orig.width * orig.height > 1000000 &&
+  if (orig.width * orig.height < 1000000 ||
       !window.confirm('This is a large image, are you sure you want to generate the pattern? It may take a while...')) {
-    return;
+    drawCanvas();
   }
 
-  // Create a larger canvas, draw a rect for each non-transparent pixel in the out canvas.
-  var scaled = document.getElementById('scaled');
-  var scaledCtx = scaled.getContext('2d');
-  scaledCtx.lineWidth = 0.5;
-  scaled.width = out.width * RESIZE;
-  scaled.height = out.height * RESIZE;
-  for (var x = 0; x < orig.width; x++) {
-    for (var y = 0; y < orig.height; y++) {
-      var idx = y*out.width*4 + x*4;
-      var p = imgd.data.subarray(idx, idx+4);
-      if (p[3] != 0) { 
-        scaledCtx.fillStyle = hex(p);
-        scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
-      }
-      scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
-    }
-  }
-  scaled.onclick = function() { window.open(scaled.toDataURL()); };
+  drawCanvas();
+
   var s = document.getElementById('selected');
   var st = document.getElementById('selected-text');
   var sc = document.getElementById('selected-color');
@@ -117,6 +100,24 @@ function palettize() {
   document.getElementById('dimensions').innerText = (
     Math.round(out.width*palette.dimensions*100)/100 + '" wide, ' +
     Math.round(out.height*palette.dimensions*100)/100 + '" tall');
+}
+
+function drawCanvas(highlight) {
+  var imgd = out.getContext('2d').getImageData(0, 0, out.width, out.height);
+  var scaledCtx = scaled.getContext('2d');
+  scaled.width = out.width * RESIZE;
+  scaled.height = out.height * RESIZE;
+  for (var x = 0; x < orig.width; x++) {
+    for (var y = 0; y < orig.height; y++) {
+      var idx = y*out.width*4 + x*4;
+      var p = imgd.data.subarray(idx, idx+4);
+      if (p[3] != 0) { 
+        scaledCtx.fillStyle = hex(p);
+        scaledCtx.fillRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
+      }
+      scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
+    }
+  }
 }
 
 function update(file) {
