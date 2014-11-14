@@ -1,0 +1,64 @@
+<!-- TODO: support file drag-and-drop -->
+<!-- TODO: support fetching file by URL (requires CORS on the server) -->
+<!-- TODO: limit number of colors so that you don't get one pixel of a color -->
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
+<title>Crafting pattern generator</title>
+<style>
+* { font-family: Arial, sans-serif; }
+div#selected { background-color: white; padding: 5px; border: 1px solid black; }
+div#selected-text { white-space: nowrap; }
+div#selected-color { border: 1px solid black; }
+a { background-color: white; border: 1px solid black; position: fixed; bottom: 10; right: 10; padding: 4px; }
+img, canvas { vertical-align: middle; }
+</style>
+</head>
+<body>
+  <h3>Select an image</h3>
+  <ul>
+    <li>...from a local file: <input type="file" id="file" accept="image/*"></input></li>
+    <li>...or choose from one of these images:</li>
+  </ul>
+  <div>
+    <img src="images/mario.png" title="Mario" />
+    <img src="images/rcr.png" title="River City Ransom" />
+    <img src="images/megaman.png" title="Mega Man" />
+    <img src="images/airman.png" title="Air Man" />
+    <img src="images/cyclops.png" title="Cyclops" />
+    <img src="images/storm.png" title="Storm" />
+    <img src="images/tyson.png" title="Mike Tyson" />
+    <img src="images/cap.png" title="Captain America" />
+  </div>
+
+  <h3>Options</h3>
+  <select id="palette">
+    <option value="dmc" selected>DMC thread</option>
+    <option value="perler">Perler beads</option>
+    <option value="simple">Simple RGB</option>
+  </select>
+  <input type="checkbox" id="bwpattern" /><label for="bwpattern">Black & white pattern</label>
+
+  <div id="table" style="display: none;">
+    <h3>Image</h3>
+    <img id="orig" title="Original image" />
+    &raquo;
+    <canvas id="out" onclick="window.open(this.toDataURL());" title="Paletted image (click to save)"></canvas>
+    <h3>Pattern</h3>
+    <p>(click to save)</p>
+    <canvas id="scaled" onclick="window.open(this.toDataURL());"></canvas>
+
+    <div id="selected" style="display: none;">
+      <div id="selected-text"></div>
+      <div id="selected-color">&nbsp;</div>
+    </div>
+    <h3>Color breakdown</h3>
+    <table id="counts"></table>
+    <h3>Physical dimensions</h3>
+    <div id="dimensions"></div>
+  </div>
+
+  <a href="https://github.com/ImJasonH/palette" target="_blank">by ImJasonH<br />source on GitHub</a>
+</body>
+<script src="crafty.js"></script>
+</html>
