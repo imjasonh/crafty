@@ -121,11 +121,13 @@ function drawCanvas(map) {
     s.style.position = 'absolute';
     s.style.top = e.pageY + 20;
     s.style.left = e.pageX + 20;
-    for (var i = 0; i < palette.colors.length; i++) {
-      var c = palette.colors[i];
-      var hc = hex(c);
-      if (hc == hex(p)) { // HACK
-        st.innerText = c[3] + ' @ (' + x + ','+ y + ')';
+    for (k in map) {
+      var ks = k.split(',');
+      var t = [p[0], p[1], p[2]].join(',');
+      var k2 = k.split(',').slice(0,3).join(',');
+      var hc = hex(p);
+      if (t == k2) {
+        st.innerText = ks[3] + ' @ (' + x + ','+ y + ')';
         if (hc in symbols) {
           st.innerText = '(' + symbols[hc] + ') ' + st.innerText;
         }
