@@ -79,6 +79,7 @@ var ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-=
 function drawCanvas(map) {
   var imgd = out.getContext('2d').getImageData(0, 0, out.width, out.height);
   var scaledCtx = scaled.getContext('2d');
+  scaledCtx.lineWidth = 1;
   scaled.width = out.width * RESIZE;
   scaled.height = out.height * RESIZE;
   var symbols = {}, a = 0;
@@ -103,6 +104,19 @@ function drawCanvas(map) {
       }
       scaledCtx.strokeRect(x*RESIZE, y*RESIZE, RESIZE-1, RESIZE-1);
     }
+  }
+
+  // Draw major lines every 10 cells
+  scaledCtx.lineWidth = 4;
+  for (var x = 0; x < scaled.width; x += 10*RESIZE) {
+    scaledCtx.moveTo(x, 0);
+    scaledCtx.lineTo(x, scaled.height);
+    scaledCtx.stroke();
+  }
+  for (var y = 0; y < scaled.height; y+= 10*RESIZE) {
+    scaledCtx.moveTo(0, y);
+    scaledCtx.lineTo(scaled.width, y);
+    scaledCtx.stroke();
   }
 
   var s = document.getElementById('selected');
