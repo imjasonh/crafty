@@ -22,8 +22,8 @@ document.getElementById('palette').onchange = function() {
 var samples = document.getElementsByTagName('img');
 for (var i = 0; i < samples.length; i++) {
   samples[i].onclick = function(e) {
+    img.onload = palettize;
     img = e.target;
-    palettize();
   };
   samples[i].style.cursor = 'pointer';
 }
@@ -159,8 +159,8 @@ function update(file) {
   var reader = new FileReader();
   reader.onload = function(e){
     img = new Image();
+    img.onload = palettize;
     img.src = e.target.result;
-    palettize();
   };
   reader.readAsDataURL(file);
 };
